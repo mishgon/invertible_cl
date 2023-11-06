@@ -19,7 +19,7 @@ class VICReg(pl.LightningModule):
             i_weight: float = 25.0,
             v_weight: float = 25.0,
             lr: float = 1e-2,
-            lr_warmup_epochs: int = 10,
+            lr_warmup_epochs: int = 100,
             weight_decay: float = 1e-6,
             **encoder_kwargs: Any
     ):
@@ -55,16 +55,16 @@ class VICReg(pl.LightningModule):
         v_reg_1 = torch.mean(F.relu(1 - torch.sqrt(embeds_1.var(dim=0) + eps)))
         v_reg_2 = torch.mean(F.relu(1 - torch.sqrt(embeds_2.var(dim=0) + eps)))
         v_reg = (v_reg_1 + v_reg_2) / 2
-        self.log(f'train/v_reg', v_reg, on_epoch=True)
+        self.log(f'pretrain/v_reg', v_reg, on_epoch=True)
 
         n, d = embeds_1.shape
         c_reg_1 = off_diagonal(embeds_1.T @ embeds_1).div(n - 1).pow_(2).sum().div(d)
         c_reg_2 = off_diagonal(embeds_2.T @ embeds_2).div(n - 1).pow_(2).sum().div(d)
         c_reg = (c_reg_1 + c_reg_2) / 2
-        self.log(f'train/c_reg', c_reg, on_epoch=True)
+        self.log(f'pretrain/c_reg', c_reg, on_epoch=True)
 
         vic_reg = self.i_weight * i_reg + self.v_weight * v_reg + c_reg
-        self.log(f'train/vic_reg', vic_reg, on_epoch=True)
+        self.log(f'pretrain/vic_reg', vic_reg, on_epoch=True)
 
         return vic_reg
 
