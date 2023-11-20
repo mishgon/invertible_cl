@@ -1,3 +1,5 @@
+from typing import Any
+
 from pl_bolts.datamodules import CIFAR10DataModule
 
 from .transforms import SimCLRViews
@@ -9,6 +11,7 @@ class CIFAR10(CIFAR10DataModule):
             data_dir: str,
             batch_size: int = 256,
             num_workers: int = 8,
+            **simclr_views_params: Any
     ) -> None:
         super().__init__(
             data_dir=data_dir,
@@ -18,9 +21,13 @@ class CIFAR10(CIFAR10DataModule):
             batch_size=batch_size
         )
 
-        self._train_transforms = SimCLRViews(
+        params = dict(
             size=32,
             jitter_strength=0.5,
             blur=False,
+        )
+        params.update(simclr_views_params)
+        self._train_transforms = SimCLRViews(
+            **params,
             final_transforms=self.default_transforms()
         )
