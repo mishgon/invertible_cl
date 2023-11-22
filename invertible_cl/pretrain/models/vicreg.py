@@ -25,7 +25,7 @@ class VICReg(pl.LightningModule):
     ):
         super().__init__()
 
-        self.save_hyperparameters(ignore='encoder')
+        self.save_hyperparameters()
 
         self.encoder, self.embed_dim = encoder(encoder_architecture, **encoder_kwargs)
         self.projector = MLP(self.embed_dim, proj_dim, proj_dim, num_hidden_layers=2, bias=False)
